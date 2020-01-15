@@ -9,18 +9,22 @@
     >
       <h4 class="item-title">{{ country.name }}</h4>
       <div class="item-details">
-        <div>capital: {{ country.capital }}</div>
-        <div>
-          population:
+        <div style="flex: 3">
+          <label>population:</label>
           {{ country.population > 1000000
           ? `${Math.floor(country.population / 1000000)}m`
           : `${Math.floor(country.population / 1000)}k`
           }}
         </div>
+        <div style="flex: 4">
+          <label>capital:</label>
+          {{ country.capital || '-' }}
+        </div>
       </div>
-      <div
-        class="item-subdetails"
-      >borders: {{ country.borders.length ? country.borders.join(' ') : '-' }}</div>
+      <div class="item-subdetails">
+        <label>borders:</label>
+        {{ country.borders.length ? country.borders.join(' ') : '-' }}
+      </div>
     </div>
   </div>
 </template>
@@ -69,6 +73,10 @@ export default {
 }
 .item-details div {
   flex: 1;
+}
+.item-details label,
+.item-subdetails label {
+  color: #A5A5A5;
 }
 .item-subdetails {
   font-size: 12px;

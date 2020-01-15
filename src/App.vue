@@ -10,7 +10,7 @@
         :countries="computedCountries"
         :selectedIndex="selectedIndex"
         :selectItem="selectItem"
-        style="width: 250px"
+        style="width: 300px"
       />
       <MapSection :latlng="(countries[selectedIndex] || {}).latlng" :countries="computedCountries"/>
     </main>
