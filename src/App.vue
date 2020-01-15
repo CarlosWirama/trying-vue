@@ -1,10 +1,19 @@
 <template>
   <div id="app">
-    <NavigationBar v-bind:searchText="searchText" :onSearchTextChanged="onSearchTextChanged"/>
-    <div style="display: flex">
-      <CountryList v-bind:countries="countries" :selectItem="selectItem"/>
-      <MapSection msg="countries[0]" v-bind:sources="countries[0]" style="flex: 1"/>
-    </div>
+    <NavigationBar
+      @searchTextChanged="onSearchTextChanged"
+      @changeSorting="onChangeSorting"
+      :average="average"
+    />
+    <main>
+      <CountryList
+        :countries="computedCountries"
+        :selectedIndex="selectedIndex"
+        :selectItem="selectItem"
+        style="width: 250px"
+      />
+      <MapSection :latlng="(countries[selectedIndex] || {}).latlng" :countries="computedCountries"/>
+    </main>
   </div>
 </template>
 
@@ -22,16 +31,45 @@ export default {
   },
   data: () => ({
     searchText: "",
-    countries: [{ id: 1, name: "singapore" }, { id: 3, name: "bangladesh" }],
-    selectedIndex: null
+    countries: [],
+    selectedIndex: null,
+    isSortAlphabetical: true
   }),
+  computed: {
+    computedCountries: function() {
+      const filteredCountries = this.countries.filter(({ name }) =>
+        name.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+      return this.isSortAlphabetical
+        ? filteredCountries.sort((a, b) => a.name - b.name)
+        : filteredCountries.sort((a, b) => b.population - a.population);
+    },
+    average: function() {
+      if (!this.computedCountries || this.computedCountries.length === 0)
+        return 0;
+      const total = this.computedCountries.reduce(
+        (subtotal, { population }) => subtotal + population,
+        0
+      );
+      return total / this.computedCountries.length;
+    }
+  },
   methods: {
-    selectItem: e => console.log("e", e),
-    onSearchTextChanged: () => {}
+    selectItem(index) {
+      if (this.selectedIndex === index) {
+        this.selectedIndex = null;
+      } else {
+        this.selectedIndex = index;
+      }
+    },
+    onSearchTextChanged(value) {
+      this.searchText = value;
+    },
+    onChangeSorting(value) {
+      this.isSortAlphabetical = !this.isSortAlphabetical;
+    }
   },
   async created() {
-    // fetch the data when the view is created and the data is
-    // already being observed
     const countries = await fetch(
       "https://restcountries-v1.p.mashape.com/all",
       {
@@ -43,18 +81,22 @@ export default {
     if (Array.isArray(countries)) {
       this.countries = countries;
     }
-    console.log(countries[0]);
   }
 };
 </script>
 
 <style>
-#app {
+body {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  background: #F4F4F4;
+}
+main {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
 }
 </style>

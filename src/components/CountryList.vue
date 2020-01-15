@@ -1,10 +1,27 @@
 <template>
-  <div style="padding: 0 8px">
-    <h3
-      v-for="country in countries"
+  <div id="list">
+    <div
+      class="item"
+      :class="{ focused: selectedIndex === index }"
+      v-for="(country, index) in countries"
       :key="country.id"
-      @click="selectItem(country.id)"
-    >{{ country.name }}</h3>
+      @click="selectItem(index)"
+    >
+      <h4 class="item-title">{{ country.name }}</h4>
+      <div class="item-details">
+        <div>capital: {{ country.capital }}</div>
+        <div>
+          population:
+          {{ country.population > 1000000
+          ? `${Math.floor(country.population / 1000000)}m`
+          : `${Math.floor(country.population / 1000)}k`
+          }}
+        </div>
+      </div>
+      <div
+        class="item-subdetails"
+      >borders: {{ country.borders.length ? country.borders.join(' ') : '-' }}</div>
+    </div>
   </div>
 </template>
 
@@ -13,6 +30,7 @@ export default {
   name: "CountryList",
   props: {
     countries: Array,
+    selectedIndex: Number,
     selectItem: Function
   }
 };
@@ -20,6 +38,41 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+#list {
+  height: 100%;
+  padding-right: 8px;
+  overflow: scroll;
+}
+.item {
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: 0.2s ease-in-out;
+}
+.item:hover {
+  background-color: #DEDEDE;
+  transition: 0.3s ease-in-out;
+}
+.item.focused {
+  background-color: #BABABA;
+  transition: 0.3s ease-in-out;
+}
+.item-title {
+  margin: 0 0 4px;
+}
+.item-details {
+  display: flex;
+  font-size: 14px;
+}
+.item-details div {
+  flex: 1;
+}
+.item-subdetails {
+  font-size: 12px;
+}
 h3 {
   margin: 40px 0 0;
 }
